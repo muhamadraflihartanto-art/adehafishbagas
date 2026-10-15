@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RotiADEBAGASHAFIS — Optimasi Produksi Roti & Kue</title>
+  <style>
+    :root {
+      --bg: #f7f4ef;
+      --surface: #ffffff;
+      --ink: #2e2925;
+      --muted: #776f68;
+      --line: #e9e1d8;
+      --brand: #8b4b2f;
+      --brand-dark: #63331f;
+      --brand-soft: #f4e4d8;
+      --green: #28765a;
+      --green-soft: #e3f3eb;
+      --shadow: 0 12px 34px rgba(66, 43, 28, .08);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0; background: var(--bg); color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    .topbar {
+      position: sticky; top: 0; z-index: 20; background: rgba(255,255,255,.92);
+      backdrop-filter: blur(12px); border-bottom: 1px solid var(--line);
+    }
+    .nav {
+      max-width: 1180px; margin: auto; padding: 14px 22px; display: flex;
+      justify-content: space-between; align-items: center; gap: 16px;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 850; letter-spacing: -.5px; }
+    .brand-mark {
+      width: 40px; height: 40px; display: grid; place-items: center; border-radius: 13px;
+      background: var(--brand); color: #fff; font-size: 21px;
+    }
+    .brand span small { display: block; color: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: .3px; }
+    .nav-links { display: flex; gap: 8px; flex-wrap: wrap; }
+    .nav-links a {
+      text-decoration: none; color: var(--muted); font-weight: 650; font-size: 13px;
+      padding: 9px 12px; border-radius: 10px;
+    }
+    .nav-links a:hover { background: var(--brand-soft); color: var(--brand-dark); }
+    .container { max-width: 1180px; margin: auto; padding: 26px 22px 60px; }
+    .hero {
+      display: grid; grid-template-columns: 1.15fr .85fr; gap: 24px; align-items: stretch;
+      padding: 28px 0 24px;
+    }
+    .hero-copy {
+      background: linear-gradient(135deg, #6c3825, #a65d3b); color: white;
+      border-radius: 26px; padding: clamp(25px, 4vw, 44px); position: relative; overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 800;
+      letter-spacing: 1.2px; text-transform: uppercase; color: #f8d9c3;
+    }
+    h1 { font-size: clamp(32px, 4vw, 51px); line-height: 1.08; letter-spacing: -1.8px; margin: 17px 0; }
+    .hero-copy p { max-width: 580px; color: #f8e9df; margin: 0 0 23px; }
+    .button {
+      border: 0; border-radius: 11px; padding: 11px 16px; font-weight: 800;
+      background: var(--brand); color: white; transition: .2s;
+    }
+    .button:hover { transform: translateY(-1px); filter: brightness(.96); }
+    .button.light { background: #fff; color: var(--brand-dark); }
+    .button.secondary { background: #f2e9e1; color: var(--brand-dark); }
+    .hero-art {
+      min-height: 300px; border-radius: 26px; overflow: hidden; position: relative;
+      background: linear-gradient(145deg, #eac6a6, #f8e8d8 50%, #c78a62);
+      display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow);
+    }
+    .hero-art:before, .hero-art:after {
+      content: ""; position: absolute; border-radius: 50%; border: 1px solid rgba(139,75,47,.16);
+      width: 310px; height: 310px;
+    }
+    .hero-art:after { width: 220px; height: 220px; }
+    .bread { position: relative; z-index: 1; font-size: clamp(100px, 14vw, 175px); filter: drop-shadow(0 16px 10px rgba(77,43,24,.16)); }
+    .floating-note {
+      position: absolute; z-index: 2; background: rgba(255,255,255,.91); padding: 12px 15px;
+      border-radius: 14px; box-shadow: var(--shadow); font-size: 12px; font-weight: 750;
+    }
+    .floating-note.one { top: 22px; left: 20px; }
+    .floating-note.two { right: 20px; bottom: 22px; }
+    .floating-note small { display: block; color: var(--muted); font-weight: 600; }
+    .section-head { display: flex; justify-content: space-between; align-items: end; gap: 16px; margin: 30px 0 15px; }
+    .section-head h2 { font-size: 24px; letter-spacing: -.6px; margin: 0; }
+    .section-head p { color: var(--muted); margin: 4px 0 0; font-size: 14px; }
+    .grid { display: grid; gap: 16px; }
+    .stats { grid-template-columns: repeat(4, 1fr); }
+    .card {
+      background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 20px; box-shadow: 0 5px 18px rgba(66,43,28,.035);
+    }
+    .stat-label { font-size: 12px; color: var(--muted); font-weight: 700; }
+    .stat-value { font-size: clamp(21px, 2.5vw, 29px); font-weight: 850; letter-spacing: -.8px; margin: 6px 0 2px; }
+    .stat-foot { font-size: 12px; color: var(--muted); }
+    .main-grid { grid-template-columns: .88fr 1.12fr; align-items: start; }
+    .card h3 { margin: 0 0 5px; font-size: 17px; letter-spacing: -.25px; }
+    .card .sub { color: var(--muted); font-size: 13px; margin: 0 0 18px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { font-size: 12px; font-weight: 750; color: #554b44; }
+    .field input, .field select {
+      width: 100%; border: 1px solid #dcd1c7; border-radius: 10px; padding: 10px 11px;
+      background: #fffdfa; color: var(--ink); outline: none;
+    }
+    .field input:focus, .field select:focus { border-color: var(--brand); box-shadow: 0 0 0 3px #8b4b2f1c; }
+    .field.full { grid-column: 1 / -1; }
+    .hint { color: var(--muted); font-size: 11px; margin-top: 2px; }
+    .form-actions { display: flex; gap: 9px; flex-wrap: wrap; margin-top: 18px; }
+    .formula {
+      background: #fbf7f2; border: 1px dashed #d9c5b6; border-radius: 12px;
+      padding: 13px 14px; margin-top: 16px; font-size: 13px;
+    }
+    .formula strong { color: var(--brand-dark); }
+    .result-highlight {
+      display: flex; justify-content: space-between; align-items: center; gap: 15px;
+      padding: 17px; border-radius: 14px; background: var(--green-soft); margin: 12px 0 16px;
+    }
+    .result-highlight small { display: block; color: #35644f; font-weight: 700; }
+    .result-highlight strong { color: #18563e; font-size: clamp(22px, 3vw, 30px); letter-spacing: -.7px; }
+    .pill { display: inline-block; background: #fff; border: 1px solid #c4e2d1; color: #216648; padding: 5px 9px; border-radius: 999px; font-size: 11px; font-weight: 800; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { text-align: left; border-bottom: 1px solid var(--line); padding: 11px 9px; white-space: nowrap; }
+    th { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .5px; }
+    tbody tr.best { background: #eff8f2; font-weight: 800; }
+    tbody tr.best td:first-child:before { content: "✓ "; color: var(--green); }
+    .graph-card { margin-top: 16px; }
+    .graph-wrap { background: #fffdfa; border: 1px solid var(--line); border-radius: 14px; padding: 8px; }
+    canvas { width: 100%; display: block; }
+    .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--muted); margin-top: 12px; }
+    .legend span { display: inline-flex; align-items: center; gap: 7px; }
+    .dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+    .dot.k1 { background: #b85f37; } .dot.k2 { background: #367d9b; } .dot.k3 { background: #6aaf87; }
+    .two-col { grid-template-columns: 1fr 1fr; }
+    .steps { display: grid; grid-template-columns: repeat(5,1fr); gap: 10px; }
+    .step { padding: 15px; background: #fff; border: 1px solid var(--line); border-radius: 14px; }
+    .step-num { width: 29px; height: 29px; display: grid; place-items: center; background: var(--brand-soft); color: var(--brand-dark); border-radius: 9px; font-weight: 850; font-size: 12px; margin-bottom: 10px; }
+    .step strong { display: block; font-size: 13px; margin-bottom: 4px; }
+    .step p { color: var(--muted); font-size: 12px; margin: 0; }
+    .callout { background: #fff; border-left: 4px solid var(--brand); border-radius: 0 13px 13px 0; padding: 16px 18px; color: #5e534b; font-size: 13px; }
+    footer { border-top: 1px solid var(--line); padding: 25px 22px; text-align: center; color: var(--muted); font-size: 12px; }
+    .toast { position: fixed; bottom: 18px; right: 18px; max-width: 330px; background: #2e2925; color: white; padding: 13px 16px; border-radius: 12px; box-shadow: var(--shadow); display: none; z-index: 40; font-size: 13px; }
+    @media (max-width: 900px) {
+      .hero, .main-grid { grid-template-columns: 1fr; }
+      .hero-art { min-height: 220px; }
+      .stats { grid-template-columns: repeat(2,1fr); }
+      .steps { grid-template-columns: repeat(2,1fr); }
+      .steps .step:last-child { grid-column: 1 / -1; }
+    }
+    @media (max-width: 560px) {
+      .nav { align-items: flex-start; flex-direction: column; }
+      .nav-links { gap: 2px; }
+      .nav-links a { padding: 7px 8px; font-size: 12px; }
+      .container { padding: 16px 14px 40px; }
+      .hero { padding-top: 10px; }
+      .hero-copy { padding: 25px; }
+      .stats, .two-col, .form-grid { grid-template-columns: 1fr; }
+      .field.full { grid-column: auto; }
+      .section-head { align-items: flex-start; flex-direction: column; }
+      .result-highlight { align-items: flex-start; flex-direction: column; }
+      .steps { grid-template-columns: 1fr; }
+      .steps .step:last-child { grid-column: auto; }
+    }
+    .view { display: none; }
+    .view.active { display: block; }
+    .stack > * + * { margin-top: 16px; }
+    .narrow { max-width: 820px; }
+    a.button { text-decoration: none; display: inline-block; }
+    .nav-links a.active { background: var(--brand-soft); color: var(--brand-dark); }
+    .formula p { margin: 4px 0; }
+    #recommendation ul { margin: 0; padding-left: 20px; }
+    #recommendation li { margin: 8px 0; }
+    @media print {
+      .view { display: block !important; }
+      .topbar, .hero-art, .form-actions, .button, footer { display: none !important; }
+      body { background: white; }
+      .container { max-width: none; padding: 0; }
+      .card { box-shadow: none; break-inside: avoid; }
+      .hero-copy { background: white; color: black; border: 1px solid #ccc; box-shadow: none; }
+      .hero-copy p, .eyebrow { color: #333; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <nav class="nav">
+      <div class="brand">
+        <div class="brand-mark">🍞</div>
+        <span>ROTI<small>ADEBAGASHAFIS</small></span>
+      </div>
+      <div class="nav-links"><a href="#dashboard" data-view="dashboard">Dashboard</a><a href="#input" data-view="input">Input Data</a><a href="#formulasi" data-view="formulasi">Formulasi LP</a><a href="#grafik" data-view="grafik">Grafik LP</a><a href="#analisis" data-view="analisis">Analisis Solusi</a></div>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="view active" id="view-dashboard">
+      <section class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow">● Linear Programming untuk UMKM</div>
+        <h1>Produksi lebih tepat.<br>Untung lebih optimal.</h1>
+        <p>Rencanakan jumlah roti dan kue berdasarkan bahan baku serta waktu produksi yang tersedia. Lihat kombinasi produksi terbaik melalui perhitungan dan grafik metode sederhana.</p>
+        <button class="button light" onclick="location.hash='input'">Mulai optimasi ↗</button>
+      </div>
+      <div class="hero-art" aria-label="Ilustrasi roti dan kue">
+        <div class="floating-note one">PERENCANAAN PRODUKSI<small>Lebih terukur setiap hari</small></div>
+        <div class="bread">🥐</div>
+        <div class="floating-note two">BAHAN + WAKTU<small>Gunakan sumber daya efisien</small></div>
+      </div>
+    </section>
+      <div class="section-head"><div><h2>Ringkasan produksi</h2><p>Hasil terbaru dari data yang kamu masukkan.</p></div><button class="button secondary" onclick="window.print()">Cetak / Simpan PDF</button></div>
+      <div class="grid stats">
+        <div class="card"><div class="stat-label">Keuntungan maksimum</div><div class="stat-value" id="statProfit">Rp 0</div><div class="stat-foot">Per hari, berdasarkan model</div></div>
+        <div class="card"><div class="stat-label">Produk A · Roti</div><div class="stat-value" id="statA">0 unit</div><div class="stat-foot">Jumlah produksi optimal</div></div>
+        <div class="card"><div class="stat-label">Produk B · Kue</div><div class="stat-value" id="statB">0 unit</div><div class="stat-foot">Jumlah produksi optimal</div></div>
+        <div class="card"><div class="stat-label">Titik pojok diperiksa</div><div class="stat-value" id="statCorners">0 titik</div><div class="stat-foot">Kandidat solusi yang feasible</div></div>
+      </div>
+      <div class="card" style="margin-top:16px"><h3>Keputusan produksi</h3><p class="sub" id="dashSummary">Masukkan data pada halaman Input Data.</p>
+        <div class="form-actions"><a class="button" href="#input">Ubah data</a><a class="button secondary" href="#grafik">Lihat grafik</a><a class="button secondary" href="#analisis">Analisis solusi</a></div></div>
+    </section>
+
+    <section class="view" id="view-input">
+      <div class="section-head"><div><h2>Input data</h2><p>Ubah angka sesuai kondisi toko roti atau kue milikmu. Angka awal adalah contoh ilustrasi.</p></div></div>
+      <div class="card narrow"><h3>Data usaha</h3>
+          <p class="sub">Angka awal adalah contoh ilustrasi. Silakan ubah sesuai kebutuhan.</p>
+          <div class="form-grid">
+            <div class="field">
+              <label for="profitA">Keuntungan per roti (Rp)</label>
+              <input id="profitA" type="number" min="0" step="500" value="2000">
+            </div>
+            <div class="field">
+              <label for="profitB">Keuntungan per kue (Rp)</label>
+              <input id="profitB" type="number" min="0" step="500" value="3000">
+            </div>
+            <div class="field">
+              <label for="aFlour">Tepung per roti (gram)</label>
+              <input id="aFlour" type="number" min="0" step="10" value="100">
+            </div>
+            <div class="field">
+              <label for="bFlour">Tepung per kue (gram)</label>
+              <input id="bFlour" type="number" min="0" step="10" value="200">
+            </div>
+            <div class="field">
+              <label for="flourLimit">Total tepung tersedia (gram)</label>
+              <input id="flourLimit" type="number" min="0" step="500" value="20000">
+            </div>
+            <div class="field">
+              <label for="aTime">Waktu per roti (menit)</label>
+              <input id="aTime" type="number" min="0" step="1" value="6">
+            </div>
+            <div class="field">
+              <label for="bTime">Waktu per kue (menit)</label>
+              <input id="bTime" type="number" min="0" step="1" value="4">
+            </div>
+            <div class="field">
+              <label for="timeLimit">Total waktu tersedia (menit)</label>
+              <input id="timeLimit" type="number" min="0" step="10" value="600">
+            </div>
+            <div class="field full">
+              <label for="unitMode">Model produksi</label>
+              <select id="unitMode">
+                <option value="continuous">Model LP grafik (jumlah boleh pecahan)</option>
+                <option value="integer">Jumlah unit utuh (pencarian bilangan bulat)</option>
+              </select>
+              <div class="hint">Metode grafik klasik mengizinkan nilai pecahan. Pilih jumlah unit utuh untuk rekomendasi produksi nyata.</div>
+            </div>
+          </div>
+          
+        <div class="form-actions"><button class="button" id="calculateBtn">Hitung solusi optimal</button><button class="button secondary" id="resetBtn">Kembalikan contoh</button></div>
+      </div>
+    </section>
+
+    <section class="view" id="view-formulasi">
+      <div class="section-head"><div><h2>Formulasi LP</h2><p>Model matematis yang dibentuk dari data yang kamu masukkan.</p></div></div>
+      <div class="stack">
+        <div class="card"><h3>Model Linear Programming</h3><div class="formula" id="formulaLive"></div></div>
+        <div class="card"><h3>Titik potong garis kendala dengan sumbu</h3><div class="table-wrap"><table><thead><tr><th>Kendala</th><th>Persamaan garis</th><th>Sumbu x (y = 0)</th><th>Sumbu y (x = 0)</th></tr></thead><tbody id="interceptRows"></tbody></table></div></div>
+        <div class="card"><h3>Langkah metode grafik</h3><div class="steps" style="margin-top:12px"><div class="step"><div class="step-num">01</div><strong>Tentukan variabel</strong><p>x = jumlah roti, y = jumlah kue.</p></div><div class="step"><div class="step-num">02</div><strong>Buat garis kendala</strong><p>Ubah tanda ≤ menjadi = untuk menggambar tiap garis.</p></div><div class="step"><div class="step-num">03</div><strong>Tentukan daerah feasible</strong><p>Ambil irisan daerah yang memenuhi seluruh kendala.</p></div><div class="step"><div class="step-num">04</div><strong>Cari titik pojok</strong><p>Periksa titik potong garis dan sumbu yang memenuhi kendala.</p></div><div class="step"><div class="step-num">05</div><strong>Evaluasi fungsi tujuan</strong><p>Bandingkan Z di tiap titik pojok, ambil yang terbesar.</p></div></div></div>
+      </div>
+    </section>
+
+    <section class="view" id="view-grafik">
+      <div class="section-head"><div><h2>Grafik LP</h2><p>Daerah hijau adalah feasible region. Titik hijau besar adalah solusi terbaik.</p></div></div>
+      <div class="card graph-card" style="margin-top:0"><div class="graph-wrap"><canvas id="lpGraph" width="760" height="470" aria-label="Grafik kendala produksi roti dan kue"></canvas></div>
+        <div class="legend"><span><i class="dot k1"></i>Kendala tepung</span><span><i class="dot k2"></i>Kendala waktu</span><span><i class="dot k3"></i>Feasible region</span></div></div>
+    </section>
+
+    <section class="view" id="view-analisis">
+      <div class="section-head"><div><h2>Analisis solusi</h2><p>Hasil optimal, evaluasi titik pojok, dan rekomendasi.</p></div></div>
+      <div class="stack">
+        <div class="card"><h3>Solusi optimal</h3>
+            <p class="sub">Kombinasi yang menghasilkan keuntungan terbesar berdasarkan kendala.</p>
+            <div class="result-highlight">
+              <div><small>KEUNTUNGAN MAKSIMUM</small><strong id="resultProfit">Rp 0</strong></div>
+              <span class="pill" id="resultStatus">Menunggu perhitungan</span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Rekomendasi</th><th>Jumlah optimal</th><th>Penggunaan</th></tr></thead>
+                <tbody>
+                  <tr><td>Roti (x)</td><td id="resultA">0</td><td id="useA">0</td></tr>
+                  <tr><td>Kue (y)</td><td id="resultB">0</td><td id="useB">0</td></tr>
+                  <tr><td>Sisa tepung</td><td colspan="2" id="leftFlour">0</td></tr>
+                  <tr><td>Sisa waktu</td><td colspan="2" id="leftTime">0</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p id="businessAdvice" class="sub" style="margin:15px 0 0;">Masukkan data lalu tekan tombol hitung.</p>
+            <div id="optimalSolutionsBox" class="callout" style="margin-top:14px;" hidden>
+              <strong id="optimalSolutionsTitle">Kombinasi optimal</strong>
+              <p id="optimalSolutionsNote" style="margin:7px 0 10px;"></p>
+              <div class="table-wrap"><table>
+                <thead><tr><th>No.</th><th>Roti (x)</th><th>Kue (y)</th><th>Keuntungan</th></tr></thead>
+                <tbody id="optimalSolutionsRows"></tbody>
+              </table></div>
+            </div>
+          </div>
+          
+        <div class="card"><h3>Pemanfaatan sumber daya</h3><p class="sub" id="bindingNote" style="margin:0">–</p></div>
+        <div class="card"><h3>Evaluasi titik pojok</h3><div class="table-wrap"><table><thead><tr><th>Titik</th><th>Roti (x)</th><th>Kue (y)</th><th>Keuntungan (Z)</th><th>Status</th></tr></thead><tbody id="cornerRows"><tr><td colspan="5">Belum ada hasil.</td></tr></tbody></table></div></div>
+        <div><h3 style="margin:6px 0 10px">Rekomendasi untuk manajemen</h3><div class="callout" id="recommendation">Belum ada hasil perhitungan.</div></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>RotiOptima · Website pembelajaran Teknik Riset Operasi · HTML, CSS, dan JavaScript</footer>
+  <div class="toast" id="toast" role="status"></div>
+
+  <script>
+    const ids = ['profitA','profitB','aFlour','bFlour','flourLimit','aTime','bTime','timeLimit','unitMode'];
+    const defaults = {
+      profitA:2000, profitB:3000, aFlour:100, bFlour:200, flourLimit:20000,
+      aTime:6, bTime:4, timeLimit:600, unitMode:'continuous'
+    };
+    let lastSolution = null;
+
+    function getData() {
+      const d = {};
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        d[id] = el.type === 'number' ? Number(el.value) : el.value;
+      });
+      return d;
+    }
+    function validate(d) {
+      for (const id of ids.filter(x => x !== 'unitMode')) {
+        if (!Number.isFinite(d[id]) || d[id] < 0 || document.getElementById(id).value.trim() === '') {
+          return 'Semua nilai harus berupa angka nol atau lebih.';
+        }
+      }
+      if ((d.aFlour === 0 && d.aTime === 0) || (d.bFlour === 0 && d.bTime === 0)) {
+        return 'Setiap produk harus menggunakan setidaknya salah satu sumber daya dengan jumlah lebih dari nol.';
+      }
+      if (d.aFlour === 0 && d.bFlour === 0 && d.flourLimit > 0 &&
+          d.aTime === 0 && d.bTime === 0 && d.timeLimit > 0) {
+        return 'Model tidak membatasi produksi; ubah kebutuhan sumber daya.';
+      }
+      return '';
+    }
+    const EPS = 1e-7;
+    function feasible(x, y, d) {
+      return x >= -EPS && y >= -EPS &&
+        d.aFlour*x + d.bFlour*y <= d.flourLimit + EPS &&
+        d.aTime*x + d.bTime*y <= d.timeLimit + EPS;
+    }
+    function intersections(d) {
+      const lines = [
+        [d.aFlour, d.bFlour, d.flourLimit, 'Tepung'],
+        [d.aTime, d.bTime, d.timeLimit, 'Waktu'],
+        [1, 0, 0, 'Sumbu x'],
+        [0, 1, 0, 'Sumbu y']
+      ];
+      const pts = [{x:0,y:0,label:'Asal (0, 0)'}];
+      for (let i=0;i<lines.length;i++) {
+        for (let j=i+1;j<lines.length;j++) {
+          const [a1,b1,c1] = lines[i], [a2,b2,c2] = lines[j];
+          const det = a1*b2-a2*b1;
+          if (Math.abs(det) < EPS) continue;
+          const x = (c1*b2-c2*b1)/det;
+          const y = (a1*c2-a2*c1)/det;
+          if (Number.isFinite(x) && Number.isFinite(y) && feasible(x,y,d)) {
+            pts.push({x:Math.abs(x)<EPS?0:x,y:Math.abs(y)<EPS?0:y,label:`(${fmtNum(x)}, ${fmtNum(y)})`});
+          }
+        }
+      }
+      const unique = [];
+      pts.forEach(p => {
+        if (!unique.some(q => Math.abs(p.x-q.x)<1e-5 && Math.abs(p.y-q.y)<1e-5)) unique.push(p);
+      });
+      return unique;
+    }
+    function sortedCorners(d) {
+      return intersections(d).sort((p,q) => (p.x-q.x) || (p.y-q.y));
+    }
+    function solve(d) {
+      const profit = p => d.profitA*p.x + d.profitB*p.y;
+      const tie = m => Math.max(1e-6, Math.abs(m) * 1e-9);
+      const corners = sortedCorners(d).map(p => ({...p, z:profit(p), corner:true}));
+      if (!corners.length) return {error:'Tidak ditemukan titik solusi yang memenuhi kendala. Periksa kembali data yang dimasukkan.'};
+      const lpMax = Math.max(...corners.map(p => p.z));
+      let points = corners, optimalPoints, maxProfit = lpMax;
+      if (d.unitMode === 'integer') {
+        const maxX = Math.floor(Math.min(
+          d.aFlour > 0 ? d.flourLimit/d.aFlour : Infinity,
+          d.aTime > 0 ? d.timeLimit/d.aTime : Infinity
+        ) + EPS);
+        if (!Number.isFinite(maxX) || maxX > 100000) return {error:'Model terlalu longgar untuk pencarian bilangan bulat. Tambahkan kendala sumber daya yang membatasi produksi.'};
+        // Untuk tiap x, y terbesar yang masih layak adalah satu-satunya kandidat terbaik.
+        const found = [];
+        for (let x=0; x<=maxX; x++) {
+          let y = Infinity;
+          if (d.bFlour > 0) y = Math.min(y, Math.floor((d.flourLimit - d.aFlour*x)/d.bFlour + EPS));
+          if (d.bTime > 0) y = Math.min(y, Math.floor((d.timeLimit - d.aTime*x)/d.bTime + EPS));
+          if (!Number.isFinite(y) || y < 0 || !feasible(x,y,d)) continue;
+          found.push({x, y, z:profit({x,y})});
+        }
+        if (!found.length) return {error:'Tidak ditemukan kombinasi bilangan bulat yang memenuhi kendala.'};
+        maxProfit = Math.max(...found.map(p => p.z));
+        optimalPoints = found.filter(p => Math.abs(p.z-maxProfit) <= tie(maxProfit));
+        const extras = optimalPoints.filter(p => !corners.some(c => Math.abs(c.x-p.x)<1e-5 && Math.abs(c.y-p.y)<1e-5));
+        points = corners.concat(extras.map(p => ({...p, corner:false})));
+      } else {
+        optimalPoints = corners.filter(p => Math.abs(p.z-lpMax) <= tie(lpMax));
+      }
+      return {points, best:optimalPoints[0], optimalPoints, maxProfit, lpMax,
+              cornerCount:corners.length, hasMultipleOptima:optimalPoints.length > 1};
+    }
+    function fmtNum(n) {
+      if (Math.abs(n) < 1e-7) n=0;
+      return Number(n.toFixed(3)).toLocaleString('id-ID',{maximumFractionDigits:3});
+    }
+    function money(n) {
+      return new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(Math.round(n));
+    }
+    function fmtUnits(n) { return `${fmtNum(n)} unit`; }
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.style.display='block';
+      clearTimeout(showToast.timer); showToast.timer=setTimeout(()=>t.style.display='none',3200);
+    }
+    function renderRecommendation(d, s) {
+      const box = document.getElementById('recommendation');
+      if (!s || s.error) { box.innerHTML = `<strong>Rekomendasi belum tersedia.</strong> ${s ? s.error : ''}`; return; }
+      const pc = v => Number(v.toFixed(1)).toLocaleString('id-ID');
+      const n = fmtNum, best = s.best, multiple = s.hasMultipleOptima, isInt = d.unitMode === 'integer';
+      const cap = t => t.charAt(0).toUpperCase() + t.slice(1);
+      const items = [];
+      if (multiple) {
+        const f = s.optimalPoints[0], l = s.optimalPoints[s.optimalPoints.length-1];
+        items.push(`Ada <b>${s.optimalPoints.length} kombinasi</b> dengan keuntungan maksimum yang sama, yaitu <b>${money(s.maxProfit)}</b> per hari, mulai dari ${n(f.x)} roti + ${n(f.y)} kue sampai ${n(l.x)} roti + ${n(l.y)} kue. Pilih berdasarkan permintaan pelanggan, variasi produk, dan kemudahan produksi.`);
+        items.push('Pemanfaatan tepung dan waktu berbeda pada tiap kombinasi, jadi cek sisa bahan setelah kombinasi dipilih.');
+      } else if (best.x < 1e-9 && best.y < 1e-9) {
+        items.push('Tidak ada produksi yang dapat dilakukan dengan data ini. Periksa kembali persediaan tepung dan waktu produksi.');
+      } else {
+        items.push(`Targetkan produksi <b>${n(best.x)} roti</b> dan <b>${n(best.y)} kue</b> per hari untuk keuntungan maksimum <b>${money(s.maxProfit)}</b>${isInt ? ' (jumlah unit utuh)' : ''}.`);
+        const pa = d.profitA*best.x, pb = d.profitB*best.y, tot = pa + pb;
+        if (best.x < 1e-9) items.push('Seluruh sumber daya sebaiknya dialihkan ke kue. Roti tidak diproduksi karena pada kondisi ini kue memberi keuntungan lebih besar untuk sumber daya yang sama.');
+        else if (best.y < 1e-9) items.push('Seluruh sumber daya sebaiknya dialihkan ke roti. Kue tidak diproduksi karena pada kondisi ini roti memberi keuntungan lebih besar untuk sumber daya yang sama.');
+        else if (tot > 0) items.push(`Kedua produk layak diproduksi bersamaan. Roti menyumbang ${pc(pa/tot*100)}% dan kue ${pc(pb/tot*100)}% dari total keuntungan.`);
+        if (isInt && s.lpMax - s.maxProfit > 1e-6) items.push(`Hasil model grafik (pecahan) adalah ${money(s.lpMax)}. Selisih ${money(s.lpMax - s.maxProfit)} terjadi karena produksi harus berupa unit utuh.`);
+        const res = [
+          {name:'tepung', unit:'gram', used:d.aFlour*best.x + d.bFlour*best.y, lim:d.flourLimit, key:'flourLimit'},
+          {name:'waktu produksi', unit:'menit', used:d.aTime*best.x + d.bTime*best.y, lim:d.timeLimit, key:'timeLimit'}
+        ];
+        const gains = [];
+        res.forEach(r => {
+          const left = r.lim - r.used;
+          if (Math.abs(left) < 1e-6) {
+            const alt = solve({...d, unitMode:'continuous', [r.key]: r.lim*1.1});
+            const gain = alt.error ? 0 : alt.lpMax - s.lpMax;
+            gains.push({name:r.name, gain});
+            items.push(`${cap(r.name)} terpakai 100% sehingga menjadi pembatas produksi. ` + (gain > 1e-6
+              ? `Menambah ${r.name} 10% (${n(r.lim*0.1)} ${r.unit}) diperkirakan menaikkan keuntungan sekitar ${money(gain)} per hari.`
+              : 'Menambahnya tidak menaikkan keuntungan pada kondisi ini.'));
+          } else {
+            const pct = r.lim > 0 ? r.used/r.lim*100 : 0;
+            items.push(`${cap(r.name)} terpakai ${pc(pct)}% dan masih tersisa ${n(left)} ${r.unit}. Tidak perlu menambah ${r.name}; sisanya bisa dicadangkan atau dialihkan.`);
+          }
+        });
+        if (gains.length === 2 && gains[0].gain > 1e-6 && gains[1].gain > 1e-6 && Math.abs(gains[0].gain - gains[1].gain) > 1e-6) {
+          const top = gains[0].gain > gains[1].gain ? gains[0] : gains[1];
+          items.push(`Jika hanya bisa menambah satu sumber daya, prioritaskan <b>${top.name}</b> karena dampaknya ke keuntungan lebih besar.`);
+        }
+      }
+      items.push('Gunakan hasil ini sebagai target awal harian, lalu sesuaikan dengan permintaan pelanggan, stok bahan, dan kapasitas tenaga kerja. Hitung ulang jika harga, kebutuhan bahan, atau waktu produksi berubah.');
+      box.innerHTML = '<ul>' + items.map(t => `<li>${t}</li>`).join('') + '</ul>';
+    }
+    function renderFormula(d) {
+      const n = fmtNum, ic = (c,a) => a > 0 ? n(c/a) : '–';
+      document.getElementById('formulaLive').innerHTML =
+        `<p><strong>Variabel keputusan:</strong> x = jumlah roti, y = jumlah kue (per hari)</p>
+         <p><strong>Fungsi tujuan:</strong> Maksimumkan Z = ${n(d.profitA)}x + ${n(d.profitB)}y</p>
+         <p><strong>Kendala tepung:</strong> ${n(d.aFlour)}x + ${n(d.bFlour)}y ≤ ${n(d.flourLimit)} gram</p>
+         <p><strong>Kendala waktu:</strong> ${n(d.aTime)}x + ${n(d.bTime)}y ≤ ${n(d.timeLimit)} menit</p>
+         <p><strong>Non-negatif:</strong> x ≥ 0 dan y ≥ 0</p>`;
+      document.getElementById('interceptRows').innerHTML =
+        `<tr><td>Tepung</td><td>${n(d.aFlour)}x + ${n(d.bFlour)}y = ${n(d.flourLimit)}</td><td>${ic(d.flourLimit,d.aFlour)}</td><td>${ic(d.flourLimit,d.bFlour)}</td></tr>
+         <tr><td>Waktu</td><td>${n(d.aTime)}x + ${n(d.bTime)}y = ${n(d.timeLimit)}</td><td>${ic(d.timeLimit,d.aTime)}</td><td>${ic(d.timeLimit,d.bTime)}</td></tr>`;
+    }
+    function render(d, solution) {
+      lastSolution = {d, solution};
+      renderFormula(d);
+      if (solution.error) {
+        showToast(solution.error);
+        document.getElementById('resultStatus').textContent='Periksa data';
+        document.getElementById('businessAdvice').textContent=solution.error;
+        document.getElementById('dashSummary').textContent=solution.error;
+        renderRecommendation(d, solution);
+        document.getElementById('optimalSolutionsBox').hidden=true;
+        drawGraph(d, []);
+        document.getElementById('cornerRows').innerHTML='<tr><td colspan="5">Solusi belum dapat dihitung.</td></tr>';
+        return;
+      }
+      const best = solution.best;
+      const optima = solution.optimalPoints;
+      const multiple = solution.hasMultipleOptima;
+      const isInt = d.unitMode === 'integer';
+      const set = (id, text) => { document.getElementById(id).textContent = text; };
+      set('statProfit', money(solution.maxProfit));
+      set('statA', multiple ? 'Beberapa kombinasi' : fmtUnits(best.x));
+      set('statB', multiple ? 'Beberapa kombinasi' : fmtUnits(best.y));
+      set('statCorners', `${solution.cornerCount} titik`);
+      set('resultProfit', money(solution.maxProfit));
+      set('resultStatus', multiple ? 'Beberapa solusi optimal' : 'Solusi optimal ditemukan');
+      set('resultA', multiple ? 'Lihat daftar kombinasi' : fmtNum(best.x));
+      set('resultB', multiple ? 'Lihat daftar kombinasi' : fmtNum(best.y));
+      set('useA', multiple ? 'Bergantung kombinasi' : `${fmtNum(d.aFlour*best.x)} g tepung, ${fmtNum(d.aTime*best.x)} menit`);
+      set('useB', multiple ? 'Bergantung kombinasi' : `${fmtNum(d.bFlour*best.y)} g tepung, ${fmtNum(d.bTime*best.y)} menit`);
+      set('leftFlour', multiple ? 'Bergantung kombinasi' : `${fmtNum(d.flourLimit-d.aFlour*best.x-d.bFlour*best.y)} gram`);
+      set('leftTime', multiple ? 'Bergantung kombinasi' : `${fmtNum(d.timeLimit-d.aTime*best.x-d.bTime*best.y)} menit`);
+      const unitLabel = isInt ? 'unit utuh' : 'unit (model LP)';
+      let advice = multiple
+        ? `Terdapat ${optima.length} kombinasi optimal dengan keuntungan maksimum ${money(solution.maxProfit)}. Lihat semua kombinasi pada daftar di bawah dan pilih sesuai kebutuhan usaha.`
+        : `Rekomendasi: produksi ${fmtNum(best.x)} roti dan ${fmtNum(best.y)} kue per hari (${unitLabel}) untuk memperoleh keuntungan maksimum ${money(solution.maxProfit)} berdasarkan data yang dimasukkan.`;
+      if (isInt && solution.lpMax - solution.maxProfit > 1e-6) {
+        advice += ` Optimum model grafik (pecahan) adalah ${money(solution.lpMax)}; selisihnya muncul karena jumlah produksi harus bulat.`;
+      }
+      set('businessAdvice', advice);
+      set('dashSummary', advice);
+      const lf = d.flourLimit-d.aFlour*best.x-d.bFlour*best.y, lt = d.timeLimit-d.aTime*best.x-d.bTime*best.y;
+      const st = (name, left, unit) => `${name} ${Math.abs(left) < 1e-6 ? 'habis terpakai (kendala aktif)' : 'masih tersisa ' + fmtNum(left) + ' ' + unit}`;
+      set('bindingNote', multiple ? 'Pemanfaatan sumber daya bergantung pada kombinasi yang dipilih.' : `${st('Tepung', lf, 'gram')}. ${st('Waktu', lt, 'menit')}. Kendala aktif adalah sumber daya yang membatasi tambahan produksi.`);
+      document.getElementById('optimalSolutionsBox').hidden = false;
+      set('optimalSolutionsTitle', multiple ? 'Beberapa kombinasi optimal' : 'Kombinasi optimal');
+      set('optimalSolutionsNote', multiple
+        ? (isInt
+          ? 'Semua kombinasi bilangan bulat dengan keuntungan maksimum ditampilkan.'
+          : 'Titik-titik di bawah memiliki keuntungan maksimum yang sama. Karena fungsi tujuan linear, kombinasi pada garis di antara titik-titik ini juga menghasilkan keuntungan yang sama.')
+        : 'Hanya satu kombinasi optimal ditemukan berdasarkan data saat ini.');
+      document.getElementById('optimalSolutionsRows').innerHTML = optima.map((p,i)=>`<tr><td>${i+1}</td><td>${fmtNum(p.x)}</td><td>${fmtNum(p.y)}</td><td>${money(p.z)}</td></tr>`).join('');
+      const key = p => `${p.x.toFixed(6)}|${p.y.toFixed(6)}`;
+      const optimalKeys = new Set(optima.map(key));
+      document.getElementById('cornerRows').innerHTML = solution.points.map((p,i)=>{
+        const isOptimal = optimalKeys.has(key(p));
+        let status = 'Titik pojok layak';
+        if (isOptimal) status = isInt ? 'Solusi bulat terbaik' : (multiple ? 'Solusi optimal' : 'Solusi terbaik');
+        else if (!p.corner) status = 'Kandidat bulat';
+        else if (isInt && Math.abs(p.z - solution.lpMax) <= 1e-6*Math.max(1, solution.lpMax)) status = 'Optimum model grafik (pecahan)';
+        const letter = String.fromCharCode(65+(i%26)) + (i>=26 ? Math.floor(i/26) : '');
+        return `<tr class="${isOptimal?'best':''}"><td>${letter}</td><td>${fmtNum(p.x)}</td><td>${fmtNum(p.y)}</td><td>${money(p.z)}</td><td>${status}</td></tr>`;
+      }).join('');
+      renderRecommendation(d, solution);
+      drawGraph(d, optima);
+    }
+
+    function drawGraph(d, points) {
+      const canvas=document.getElementById('lpGraph');
+      const ctx=canvas.getContext('2d');
+      const rect=canvas.getBoundingClientRect();
+      const cssW=Math.max(300,rect.width || 700), cssH=470;
+      const ratio=window.devicePixelRatio || 1;
+      canvas.width=cssW*ratio; canvas.height=cssH*ratio;
+      canvas.style.height=cssH+'px';
+      ctx.setTransform(ratio,0,0,ratio,0,0);
+      ctx.clearRect(0,0,cssW,cssH);
+      const pad={l:56,r:22,t:22,b:48};
+      const w=cssW-pad.l-pad.r, h=cssH-pad.t-pad.b;
+      const xCap=Math.max(10, d.aFlour>0?d.flourLimit/d.aFlour:0, d.aTime>0?d.timeLimit/d.aTime:0,
+        points.reduce((m,p)=>Math.max(m,p.x),0))*1.12;
+      const yCap=Math.max(10, d.bFlour>0?d.flourLimit/d.bFlour:0, d.bTime>0?d.timeLimit/d.bTime:0,
+        points.reduce((m,p)=>Math.max(m,p.y),0))*1.12;
+      const X=x=>pad.l+(x/xCap)*w;
+      const Y=y=>pad.t+h-(y/yCap)*h;
+      ctx.font='11px system-ui'; ctx.strokeStyle='#eee4db'; ctx.fillStyle='#776f68'; ctx.lineWidth=1;
+      for(let i=0;i<=5;i++){
+        const x=xCap*i/5, y=yCap*i/5;
+        ctx.beginPath();ctx.moveTo(X(x),pad.t);ctx.lineTo(X(x),pad.t+h);ctx.stroke();
+        ctx.beginPath();ctx.moveTo(pad.l,Y(y));ctx.lineTo(pad.l+w,Y(y));ctx.stroke();
+        ctx.fillText(fmtNum(x),X(x)-7,pad.t+h+18);
+        ctx.fillText(fmtNum(y),pad.l-42,Y(y)+4);
+      }
+      ctx.strokeStyle='#6c625a';ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.moveTo(pad.l,pad.t);ctx.lineTo(pad.l,pad.t+h);ctx.lineTo(pad.l+w,pad.t+h);ctx.stroke();
+      ctx.fillStyle='#4e453f';ctx.font='12px system-ui';
+      ctx.fillText('Roti (x)',pad.l+w/2-22,cssH-8);
+      ctx.save();ctx.translate(14,pad.t+h/2);ctx.rotate(-Math.PI/2);ctx.fillText('Kue (y)',-20,0);ctx.restore();
+
+      // Garis kendala dipotong pada keempat sisi area grafik.
+      function line(a,b,c,color) {
+        const pts = [];
+        const add = (x,y) => { if (x>=-1e-9 && x<=xCap+1e-9 && y>=-1e-9 && y<=yCap+1e-9) pts.push({x,y}); };
+        if (b !== 0) { add(0, c/b); add(xCap, (c-a*xCap)/b); }
+        if (a !== 0) { add(c/a, 0); add((c-b*yCap)/a, yCap); }
+        if (pts.length < 2) return;
+        let p1 = pts[0], p2 = pts[1], far = -1;
+        for (let i=0;i<pts.length;i++) for (let j=i+1;j<pts.length;j++) {
+          const dist = Math.hypot(pts[i].x-pts[j].x, pts[i].y-pts[j].y);
+          if (dist > far) { far = dist; p1 = pts[i]; p2 = pts[j]; }
+        }
+        ctx.strokeStyle=color; ctx.lineWidth=2.5; ctx.beginPath();
+        ctx.moveTo(X(p1.x),Y(p1.y)); ctx.lineTo(X(p2.x),Y(p2.y)); ctx.stroke();
+      }
+
+      // Daerah feasible: titik pojok diurutkan mengelilingi titik tengahnya.
+      const corners = sortedCorners(d);
+      if (corners.length >= 3) {
+        const cx = corners.reduce((s,p)=>s+p.x,0)/corners.length, cy = corners.reduce((s,p)=>s+p.y,0)/corners.length;
+        const poly = corners.slice().sort((a,b)=>Math.atan2(a.y-cy,a.x-cx)-Math.atan2(b.y-cy,b.x-cx));
+        ctx.beginPath(); poly.forEach((p,i)=>i?ctx.lineTo(X(p.x),Y(p.y)):ctx.moveTo(X(p.x),Y(p.y)));
+        ctx.closePath(); ctx.fillStyle='rgba(106,175,135,.25)'; ctx.fill();
+      }
+      line(d.aFlour,d.bFlour,d.flourLimit,'#b85f37');
+      line(d.aTime,d.bTime,d.timeLimit,'#367d9b');
+
+      // Titik pojok berlabel sesuai tabel (A, B, C, ...).
+      if (points && points.length) {
+        ctx.font='bold 12px system-ui';
+        corners.forEach((p,i)=>{
+          ctx.fillStyle='#4e453f'; ctx.beginPath(); ctx.arc(X(p.x),Y(p.y),4,0,Math.PI*2); ctx.fill();
+          ctx.fillText(String.fromCharCode(65+(i%26)), X(p.x)+7, Y(p.y)-7);
+        });
+        points.forEach((p,i)=>{
+          ctx.fillStyle='#28765a'; ctx.beginPath(); ctx.arc(X(p.x),Y(p.y),6.5,0,Math.PI*2); ctx.fill();
+          ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
+          if (i===0) {
+            ctx.fillStyle='#18563e'; ctx.font='bold 12px system-ui';
+            const label = points.length>1 ? 'Titik optimal' : 'Optimal';
+            ctx.fillText(label, Math.max(pad.l, Math.min(X(p.x)+10, cssW-100)), Math.max(18, Y(p.y)+20));
+          }
+        });
+      }
+    }
+    function calculate() {
+      const d=getData();
+      const err=validate(d);
+      if(err){showToast(err);return false;}
+      const s=solve(d);
+      render(d,s);
+      return !s.error;
+    }
+    const views=['dashboard','input','formulasi','grafik','analisis'];
+    function showView(name) {
+      if(!views.includes(name)) name='dashboard';
+      views.forEach(v=>document.getElementById('view-'+v).classList.toggle('active',v===name));
+      document.querySelectorAll('.nav-links a').forEach(a=>a.classList.toggle('active',a.dataset.view===name));
+      if(name==='grafik'&&lastSolution) drawGraph(lastSolution.d,lastSolution.solution.optimalPoints||[]);
+      window.scrollTo(0,0);
+    }
+    window.addEventListener('hashchange',()=>showView(location.hash.slice(1)));
+    document.getElementById('calculateBtn').addEventListener('click',()=>{if(calculate())location.hash='dashboard';});
+    document.getElementById('resetBtn').addEventListener('click',()=>{
+      ids.forEach(id=>document.getElementById(id).value=defaults[id]);
+      calculate();showToast('Data contoh berhasil dikembalikan.');
+    });
+    ids.forEach(id=>{
+      document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')calculate();});
+      document.getElementById(id).addEventListener('change',calculate);
+    });
+    window.addEventListener('resize',()=>{if(lastSolution)drawGraph(lastSolution.d,lastSolution.solution.optimalPoints||[]);});
+    calculate();
+    showView(location.hash.slice(1));
+  </script>
+</body>
+</html>
